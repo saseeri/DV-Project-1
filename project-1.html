@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="d3.min.js"></script>
+    <title>Hajj Data Visualization</title>
+  </head>
+    
+
+  <style>
+      
+      html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+      }
+      
+      #header{
+          background-color: black;
+          width: inherit;
+          height:100px;
+          top:0px;
+          left: 0px;
+          text-align: center;
+      }
+      
+      #font{
+          padding: 0.4em;
+          color: #CBA135;
+          font-size:400%;
+          text-align: center;
+      }
+      
+      #font1{
+          padding: 1.1em;
+          color: #CBA135;
+          font-size:150%;
+          text-align: center;
+          word-spacing: 35px;
+      }
+      
+      #footer{
+          background-color: black;
+          color: #CBA135;
+          width:inherit;
+          height:100px;
+          bottom:-193px;
+          left: 0px;
+          position:absolute;
+          text-align: center;
+      }
+      
+      #container {
+            width: inherit;
+            height: inherit;
+      }
+      
+      #left {
+          width: 200px;          
+          height: inherit;          
+          float: left;
+         
+      }
+      
+      #right {
+          width: 200px;          
+          height: inherit;          
+          float: right;
+        
+      }
+      
+      #line{
+          background-color: #446653;
+          position: absolute;
+          width:100%;
+          height:15px;
+          top:102px;
+          left: 0px; 
+      }
+      
+      #line-2{
+          background-color: #CBA135;
+          position: absolute;
+          width:inherit;
+          height:7px;
+          bottom:93px;
+          left: 0px;
+      }
+      
+      #line-3{
+          background-color: #446653;
+          position: absolute;
+          width:inherit;
+          height:7px;
+          bottom:80px;
+          left: 0px;
+      }
+
+      #chart {
+		  width: 800px;
+		  height: 500px;
+          background-color: white;
+          
+	    }
+      
+      .bars { /* initial state of the bars */
+          fill: whitesmoke; /* color of bars */
+          -webkit-transition: 0.5s; /* this enables animated transition: what to change "fill" and how long "0.5s"  */
+      }
+
+      .bars:hover { /* hover state of bars: style change when mouse cursor is over the bars */
+          fill: #CBA135;
+          -webkit-transition: 0.5s; /* we need this again so that transition occurs in both directions */
+      }
+
+      .tooltip { /* CSS styles of tooltip that will be created in line 79 */
+      position: absolute; 
+      width: 60px;                  
+      height: 28px;
+      text-align: center;                                      
+      font: 18px sans-serif; 
+      padding: 5px; 
+      pointer-events: none; 
+      font-style: italic;
+      }
+      
+      .tooltip-1 {   
+      position: absolute;           
+      text-align: center;           
+      width: 60px;                  
+      height: 28px;                 
+      padding: 2px;             
+      font: 12px sans-serif;        
+      background: white;   
+      border: 1px solid black;   
+      border-radius: 5px;
+      pointer-events: none;  
+      padding-left: 1em;
+      padding-right: 1em;
+     }
+      
+      .line {
+             fill: none;
+             stroke: #A9A8A6;
+             stroke-width: 2px;
+      }
+      
+     .area {
+            fill: url(#gradient);
+            stroke-width: 0;
+      }
+      
+      .dot {
+            fill: #A9A8A6;
+            position: absolute; 
+      }
+      
+      .dot:hover { /* hover state of bars: style change when mouse cursor is over the bars */
+          fill: #446653;
+          -webkit-transition: 0.5s; /* we need this again so that transition occurs in both directions */
+      }
+      
+     .bar { /* initial state of the bars */
+           fill: #696969; /* color of bars */
+           opacity: 0.2;
+      }
+      
+      .d3-tip {
+          line-height: 1;
+          padding: 12px;
+          background: rgba(0, 0, 0, 0.8);
+          color: #fff;
+          border-radius: 2px;
+          font-size: 14px;
+        }
+
+        /* Creates a small triangle extender for the tooltip */
+        .d3-tip:after {
+          box-sizing: border-box;
+          display: inline;
+          font-size: 10px;
+          width: 100%;
+          line-height: 1;
+          color: rgba(0, 0, 0, 0.8);
+          content: "\25BC";
+          position: absolute;
+          text-align: center;
+        }
+
+        /* Style northward tooltips differently */
+        .d3-tip.n:after {
+          margin: -1px 0 0 0;
+          top: 100%;
+          left: 0;
+        }
+
+  </style>
+    
+  <body>
+      
+      <header id="header">
+          <div id="font" style="font-family:ParmaPetit-Normal">. . . . . . . . . . . . . . . . . Pilgrimage to Mecca . . . . . . . . . . . . . . . . .</div>
+           <div id="line">     </div>
+      </header>
+      
+        <div id="container">
+        	 	
+        <table id="container" style="border: 0px; border-spacing: 0px opacity: 0.0">
+          <tr>
+            <td width="25%"> </td>
+            <td width="50%" VALIGN = Bottom Align = Center style="background-color: white" >
+                <div style="background: linear-gradient(azure,white)" >
+                     <p style="text-align: justify; padding: 1em; font-size: 17px; background: linear-gradient(azure,white)">Hajj is an annual Islamic pilgrimage to Mecca, and a mandatory religious duty for Muslims that must be carried out at least once in their lifetime. There are millions of people come every year from all around the world in order to practice Hajj in Mecca. In 2012, Macca hosted the highest number of pilgrims ever and it was the hardest year for them. Therefore, the Saudi government decided to decrease number of pilgrims until they reach 1,862,909 in 2016 in order to provide a safe environment and protect them from having problems.</p>
+                </div>
+                <div id="chart">  </div>
+                <img style="position: absolute; width: 80%; left: 140px;  bottom:-149px" src="data/mecca.png"/>
+
+            </td>
+            <td width="25%"></td>
+          </tr>
+        </table>
+
+	    </div>
+      
+      <footer id="footer">
+        <div id="line-2">     </div>
+        <div id="line-3">     </div>
+        <div id="font1">2007    2008    2009    2010    2011    2012    2013    2014    2015    2016</div> 
+      </footer>
+      
+  </body>
+
+  <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+    
+  <script>
+
+  // get the data
+  d3.csv("data/hajjdata.csv", function(error, data) {
+  if (error) throw error;
+  
+  // notation
+  var formatTime = d3.time.format("%Y");
+ 
+  // get the data
+  var parseDate = d3.time.format("%Y").parse;
+      
+  // format the data
+  data.forEach(function(d) {
+      d.date = parseDate(d.date);
+      d.number = +d.number; //hcalender
+      d.hcalender = parseDate(d.hcalender);
+  });
+      
+  var tip = d3.tip()
+  .attr('class', 'd3-tip')
+  .offset([-10, 0])
+  .html(function(d) {
+    if (d.number == 3161573 || d.number == 1862909) {
+        if(d.number == 3161573)
+            return  d.number+ "<br/>" +"<span style='color:#FF0000; text-align: center'>Highest number of pilgrims</span>";
+        else
+            return  d.number+ "<br/>" +"<span style='color:#FF0000; text-align: center'>Lowest number of pilgrims</span>";
+    } 
+
+    else
+        return  d.number+ "<br/>" +"<span style='color:#CBA135; text-align: center'>pilgrims</span>";
+
+  })
+      
+  // set the dimensions and margins of the graph
+  var margin = {top: 10, right: 10, bottom: 0, left: 10},
+                width = 800 - margin.left - margin.right,
+                height = 500 - margin.top - margin.bottom;
+  
+  // set the ranges for the area chart
+  var x = d3.time.scale().range([0, width]);
+  var y = d3.scale.linear().range([height, 0]);
+  
+  var barOuterPad = 0.9, barPad = -0.1;
+   
+  // set the ranges for the bar chart
+  var xScale = d3.scale.ordinal()
+		         .domain(data.map(function(d) { return d.date; }))
+		         .rangeRoundBands([0, width], barOuterPad, barPad);
+
+  var yScale = d3.scale.linear()
+		         .domain([0, d3.max(data, function(d) { return d.number; })])
+		         .range([height, 0]); 
+      
+  // define the area
+  var area = d3.svg.area()
+                   .x(function(d) { return x(d.date); })
+                   .y0(height)
+                   .y1(function(d) { return y(d.number); });
+      
+  // define the line
+  var valueline = d3.svg.line()
+                    .x(function(d) { return x(d.date); })
+                    .y(function(d) { return y(d.number); });
+  
+  var svg = d3.select("#chart")
+	          .append("svg")
+              .attr("width", width + margin.left + margin.right)
+              .attr("height", height + margin.top + margin.bottom)
+              .append("g")
+              .attr("transform","translate(" + margin.left + "," + margin.top + ")");
+              
+  svg.call(tip);
+      
+  // scale the range of the data
+  x.domain(d3.extent(data, function(d) { return d.date; }));
+  y.domain([0, d3.max(data, function(d) { return d.number; })]);
+   
+  //Needed for gradients
+  var gradient = svg.append("defs")
+  .append("linearGradient")
+    .attr("id", "gradient")
+    .attr("x1", "0%")
+    .attr("y1", "100%")
+    .attr("x2", "0%")
+    .attr("y2", "0%");
+    
+  gradient.append("stop")
+    .attr("offset", "30%")
+    .attr("stop-color", "whitesmoke")
+    .attr("stop-opacity", 1);
+
+  gradient.append("stop")
+    .attr("offset", "100%")
+    .attr("stop-color", "#968D99")
+    .attr("stop-opacity", 0.5);
+      
+  // add the area  
+  svg.append("path")
+     .datum(data)
+     .attr("class", "area")
+     .attr("d", area);
+ 
+  // add the line
+  svg.append("path")
+     .attr("class", "line")
+     .attr("d", valueline(data));
+
+  svg.selectAll("dot")    
+        .data(data)         
+        .enter().append("circle") 
+        .attr("class", "dot")
+        .attr("r", 8)       
+        .attr("cx", function(d) { return x(d.date); })       
+        .attr("cy", function(d) { return y(d.number); });
+  
+  svg.selectAll("bar") // Drawing the bars -- nothing new here until line 92
+        .data(data)
+        .enter().append("rect")
+        .attr("class", "bar")
+        .attr("x", function(d) { return xScale(d.date); })
+        .attr("width", 8)
+        .attr("y", function(d) { return yScale(d.number); })
+        .attr("height", function(d) { return height - yScale(d.number); });
+      
+  //------------------------------------//
+// Start of Interactive D3 Components
+
+  // D3 creating DIV (containers) of the tooltips
+  var div = d3.select("#chart")
+        .append("div") // adds DIV to the page
+        .attr("class", "tooltip") // assigns CSS class "tooltip" -- see line 28     
+        .style("opacity", 0); // begin state of tooltip : it needs to be hidden
+
+  svg.selectAll("bar") // Drawing the bars -- nothing new here until line 92
+        .data(data)
+        .enter().append("rect")
+        .attr("class", "bars")
+        .attr("x", function(d) { return xScale(d.date); })
+        .attr("width", 8)
+        .attr("y", function(d) { return yScale(d.number); })
+        .attr("height", function(d) { return height - yScale(d.number); })
+        .on("mouseover", function(d) { // hover state events when mouse cursor enters a bar
+        
+        div.transition() // enables the tooltip to animate into the page
+           .duration(20) // duration of the transition animation in milliseconds
+           .style("opacity", 1); // end state of animation -- begin state can be found in line 82
+
+        div.html(formatTime(d.hcalender)) // text inside the tooltip
+           .style("left", (d3.event.pageX) + "px") // horizontal position of text
+           .style("top", (d3.event.pageY - 28) + "px"); // vertical position of text
+        
+
+        })
+        .on("mouseout", function(d) { // hover events when mouse cursor leaves the bar
+          div.transition()
+          .duration(50)
+          .style("opacity", 0);
+
+  });
+      
+  var div1 = d3.select("#chart").append("div1")   
+              .attr("class", "tooltip-1")               
+              .style("opacity", 0);
+  svg.selectAll("dot")    
+        .data(data)         
+        .enter().append("circle")                               
+        .attr("r", 8)
+        .attr("class", "dot")
+        .attr("cx", function(d) { return x(d.date); })       
+        .attr("cy", function(d) { return y(d.number); })     
+        .on("mouseover", function(d) {      
+            div1.transition()        
+                .duration(200)      
+                .style("opacity", .9);      
+            div1 .html(d.number+"<br/>"+"pilgrims")  
+                .style("left", (d3.event.pageX- 25) + "px")     
+                .style("top", (d3.event.pageY - 50) + "px");    
+            })                  
+        .on("mouseout", function(d) {       
+            div1.transition()        
+                .duration(500)      
+                .style("opacity", 0);   
+        })
+      .on('mouseover', tip.show)
+      .on('mouseout', tip.hide);
+
+// End of Interactive D3 Components
+//---------------------------------//
+      
+
+});
+      
+  </script>
+    
+</html>
