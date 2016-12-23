@@ -240,10 +240,10 @@
   if (error) throw error;
   
   // notation
-  var formatTime = d3.time.format("%Y");
+  var formatTime = d3.time.format("%Y H");
  
   // get the data
-  var parseDate = d3.time.format("%Y H").parse;
+  var parseDate = d3.time.format("%Y").parse;
       
   // format the data
   data.forEach(function(d) {
